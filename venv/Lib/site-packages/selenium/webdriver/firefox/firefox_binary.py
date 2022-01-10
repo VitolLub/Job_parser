@@ -17,7 +17,7 @@
 
 
 import os
-from platform import system
+import platform
 from subprocess import Popen, STDOUT
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common import utils
@@ -43,8 +43,7 @@ class FirefoxBinary(object):
         # a while the pipe would fill up and Firefox would freeze.
         self._log_file = log_file or open(os.devnull, "wb")
         self.command_line = None
-        self.platform = system().lower()
-        if not self._start_cmd:
+        if self._start_cmd is None:
             self._start_cmd = self._get_firefox_start_cmd()
         if not self._start_cmd.strip():
             raise WebDriverException(
@@ -85,10 +84,10 @@ class FirefoxBinary(object):
     def _start_from_profile_path(self, path):
         self._firefox_env["XRE_PROFILE_PATH"] = path
 
-        if self.platform == 'linux':
+        if platform.system().lower() == 'linux':
             self._modify_link_library_path()
         command = [self._start_cmd, "-foreground"]
-        if self.command_line:
+        if self.command_line is not None:
             for cli in self.command_line:
                 command.append(cli)
         self.process = Popen(
@@ -99,7 +98,7 @@ class FirefoxBinary(object):
         """Blocks until the extension is connectable in the firefox."""
         count = 0
         while not utils.is_connectable(self.profile.port):
-            if self.process.poll():
+            if self.process.poll() is not None:
                 # Browser has exited
                 raise WebDriverException(
                     "The browser appears to have exited "
@@ -149,24 +148,24 @@ class FirefoxBinary(object):
     def _get_firefox_start_cmd(self):
         """Return the command to start firefox."""
         start_cmd = ""
-        if self.platform == "darwin":  # small darwin due to lower() in self.platform
+        if platform.system() == "Darwin":
             start_cmd = "/Applications/Firefox.app/Contents/MacOS/firefox-bin"
             # fallback to homebrew installation for mac users
             if not os.path.exists(start_cmd):
                 start_cmd = os.path.expanduser("~") + start_cmd
-        elif self.platform == "windows":  # same
+        elif platform.system() == "Windows":
             start_cmd = (self._find_exe_in_registry() or self._default_windows_location())
-        elif self.platform == 'java' and os._name == 'nt':
+        elif platform.system() == 'Java' and os._name == 'nt':
             start_cmd = self._default_windows_location()
         else:
             for ffname in ["firefox", "iceweasel"]:
                 start_cmd = self.which(ffname)
-                if start_cmd:
+                if start_cmd is not None:
                     break
             else:
                 # couldn't find firefox on the system path
                 raise RuntimeError(
-                    "Could not find firefox in your system PATH."
+                    "Could not find firefox in your system PATH." +
                     " Please specify the firefox binary location or install firefox")
         return start_cmd
 

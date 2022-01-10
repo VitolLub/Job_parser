@@ -43,8 +43,7 @@ class Mobile(object):
     AIRPLANE_MODE = ConnectionType(1)
 
     def __init__(self, driver):
-        import weakref
-        self._driver = weakref.proxy(driver)
+        self._driver = driver
 
     @property
     def network_connection(self):

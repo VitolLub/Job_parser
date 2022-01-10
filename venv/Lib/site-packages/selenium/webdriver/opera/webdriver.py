@@ -14,6 +14,8 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import warnings
+
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromiumDriver
 from .options import Options
 
@@ -40,9 +42,16 @@ class OperaDriver(ChromiumDriver):
          - service_args - List of args to pass to the driver service
          - desired_capabilities: Dictionary object with non-browser specific
          - service_log_path - Where to log information from the driver.
+         - opera_options - Deprecated argument for options
            capabilities only, such as "proxy" or "loggingPref".
         """
-        executable_path = (executable_path if executable_path else "operadriver")
+        if opera_options:
+            warnings.warn('use options instead of opera_options',
+                          DeprecationWarning, stacklevel=2)
+            options = opera_options
+
+        executable_path = (executable_path if executable_path is not None
+                           else "operadriver")
         ChromiumDriver.__init__(self,
                                 executable_path=executable_path,
                                 port=port,

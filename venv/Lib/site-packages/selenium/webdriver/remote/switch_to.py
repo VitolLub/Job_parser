@@ -16,58 +16,55 @@
 # under the License.
 
 from .command import Command
-
-from selenium.common.exceptions import (NoSuchElementException,
-                                        NoSuchFrameException,
-                                        NoSuchWindowException)
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException, NoSuchFrameException, NoSuchWindowException
+
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 class SwitchTo:
     def __init__(self, driver):
-        import weakref
-        self._driver = weakref.proxy(driver)
+        self._driver = driver
 
     @property
-    def active_element(self) -> WebElement:
+    def active_element(self):
         """
         Returns the element with focus, or BODY if nothing has focus.
 
         :Usage:
-            ::
-
-                element = driver.switch_to.active_element
+            element = driver.switch_to.active_element
         """
-        return self._driver.execute(Command.W3C_GET_ACTIVE_ELEMENT)['value']
+        if self._driver.w3c:
+            return self._driver.execute(Command.W3C_GET_ACTIVE_ELEMENT)['value']
+        else:
+            return self._driver.execute(Command.GET_ACTIVE_ELEMENT)['value']
 
     @property
-    def alert(self) -> Alert:
+    def alert(self):
         """
         Switches focus to an alert on the page.
 
         :Usage:
-            ::
-
-                alert = driver.switch_to.alert
+            alert = driver.switch_to.alert
         """
         alert = Alert(self._driver)
         alert.text
         return alert
 
-    def default_content(self) -> None:
+    def default_content(self):
         """
         Switch focus to the default frame.
 
         :Usage:
-            ::
-
-                driver.switch_to.default_content()
+            driver.switch_to.default_content()
         """
         self._driver.execute(Command.SWITCH_TO_FRAME, {'id': None})
 
-    def frame(self, frame_reference) -> None:
+    def frame(self, frame_reference):
         """
         Switches focus to the specified frame, by index, name, or webelement.
 
@@ -76,13 +73,11 @@ class SwitchTo:
                             or a webelement that is an (i)frame to switch to.
 
         :Usage:
-            ::
-
-                driver.switch_to.frame('frame_name')
-                driver.switch_to.frame(1)
-                driver.switch_to.frame(driver.find_elements(By.TAG_NAME, "iframe")[0])
+            driver.switch_to.frame('frame_name')
+            driver.switch_to.frame(1)
+            driver.switch_to.frame(driver.find_elements_by_tag_name("iframe")[0])
         """
-        if isinstance(frame_reference, str):
+        if isinstance(frame_reference, basestring) and self._driver.w3c:
             try:
                 frame_reference = self._driver.find_element(By.ID, frame_reference)
             except NoSuchElementException:
@@ -93,33 +88,17 @@ class SwitchTo:
 
         self._driver.execute(Command.SWITCH_TO_FRAME, {'id': frame_reference})
 
-    def new_window(self, type_hint=None) -> None:
-        """Switches to a new top-level browsing context.
-
-        The type hint can be one of "tab" or "window". If not specified the
-        browser will automatically select it.
-
-        :Usage:
-            ::
-
-                driver.switch_to.new_window('tab')
-        """
-        value = self._driver.execute(Command.NEW_WINDOW, {'type': type_hint})['value']
-        self._w3c_window(value['handle'])
-
-    def parent_frame(self) -> None:
+    def parent_frame(self):
         """
         Switches focus to the parent context. If the current context is the top
         level browsing context, the context remains unchanged.
 
         :Usage:
-            ::
-
-                driver.switch_to.parent_frame()
+            driver.switch_to.parent_frame()
         """
         self._driver.execute(Command.SWITCH_TO_PARENT_FRAME)
 
-    def window(self, window_name) -> None:
+    def window(self, window_name):
         """
         Switches focus to the specified window.
 
@@ -127,12 +106,13 @@ class SwitchTo:
          - window_name: The name or window handle of the window to switch to.
 
         :Usage:
-            ::
-
-                driver.switch_to.window('main')
+            driver.switch_to.window('main')
         """
-        self._w3c_window(window_name)
-        return
+        if self._driver.w3c:
+            self._w3c_window(window_name)
+            return
+        data = {'name': window_name}
+        self._driver.execute(Command.SWITCH_TO_WINDOW, data)
 
     def _w3c_window(self, window_name):
         def send_handle(h):

@@ -22,7 +22,7 @@ from ..utils import keys_to_typing
 class KeyActions(Interaction):
 
     def __init__(self, source=None):
-        if not source:
+        if source is None:
             source = KeyInput(KEY)
         self.source = source
         super(KeyActions, self).__init__(source)

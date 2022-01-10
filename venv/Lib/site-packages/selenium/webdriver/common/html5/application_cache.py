@@ -16,11 +16,8 @@
 # under the License.
 
 """
-The ApplicationCache implementation.
+The ApplicationCache implementaion.
 """
-
-
-import warnings
 
 from selenium.webdriver.remote.command import Command
 
@@ -36,13 +33,11 @@ class ApplicationCache(object):
 
     def __init__(self, driver):
         """
-        Creates a new Application Cache.
+        Creates a new Aplication Cache.
 
         :Args:
          - driver: The WebDriver instance which performs user actions.
         """
-        warnings.warn("Application Cache is being removed from all major browsers. This feature will be removed in future versions",
-                      DeprecationWarning, stacklevel=2)
         self.driver = driver
 
     @property

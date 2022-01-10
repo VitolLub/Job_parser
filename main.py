@@ -85,8 +85,7 @@ if __name__ == '__main__':
     time.sleep(3)
     for i in range(1,PAGE):
         goto(driver,i)
-        if i == 3:
-            break
+
     print(position_arr)
     print(len(position_arr))
     print(title_arr)
