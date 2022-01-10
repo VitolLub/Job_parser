@@ -30,10 +30,42 @@ def start():
 
 def click_buttom(driver):
     try:
-        driver.find(By.XPATH,"//button[@id='button_10_14_0_0']").click()
+        driver.find(By.XPATH,"//h3[@class='acc_head']").click()
     except:
         print("No more pages")
 
+    return driver
+
+
+def grab(driver):
+    iframe = driver.find_element(By.XPATH, "//iframe[@src='https://fernuni-hagen.hr4you.org/job_liste_extern.php']")
+    # get src of iframe
+    driver.switch_to.frame(iframe)
+    time.sleep(5)
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    # print(soup)
+    # # find the div with the class "content"
+    # find all td class "jobListData"
+    jobListData = soup.find_all("tr", {'class': "jobListData"})
+    for jobs in jobListData:
+        tds = jobs.find_all("td")
+        for index, td in enumerate(tds):
+            try:
+                link_arr.append(td.find("a")['href'])
+            except:
+                print("No href")
+            if index == 0:
+                # print(td)
+                # split the string
+
+                res = td.text.split("\n\n")
+                # print(res)
+                title_arr.append(res[1].strip())
+                position_arr.append(res[2].strip())
+            elif index == 1:
+                date = td.text
+                application_arr.append(date.strip())
     return driver
 
 
@@ -42,15 +74,16 @@ if __name__ == '__main__':
     # receive the html of the page
     # receive data
     driver = click_buttom(driver)
-    html = driver.page_source
-    # html = driver.page_source
-    # parse the html
-    soup = BeautifulSoup(html, 'html.parser')
-    # find the div with the class "content"
-    content = soup.find_all(By.XPATH, "//table[@id='stellenangebote']")
-    for i in content:
-        # find the title
-        titles = i.find_all(By.XPATH, "//tr[@class='jobListData']")
-        for j in titles:
-            print(j.text)
+    time.sleep(5)
+    driver = grab(driver)
+    driver.close()
+
+    print(title_arr)
+    print(len(title_arr))
+    print(link_arr)
+    print(len(link_arr))
+    print(position_arr)
+    print(len(position_arr))
+    print(application_arr)
+    print(len(application_arr))
 
