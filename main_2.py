@@ -68,7 +68,7 @@ def grab_application_name(col_12):
             try:
                 h3 = app.find('p',{'class':'jobElementDate--o8uhBPaHYk'})
                 application_arr.append(h3.text)
-            except: 
+            except:
                 application_arr.append("")
 
 
