@@ -68,8 +68,7 @@ def grab_application_name(col_12):
             try:
                 h3 = app.find('p',{'class':'jobElementDate--o8uhBPaHYk'})
                 application_arr.append(h3.text)
-            except:
-                print("error")
+            except: 
                 application_arr.append("")
 
 
@@ -102,14 +101,17 @@ if __name__ == '__main__':
 
     driver.close()
     # prepear title
+    # array to touple
+    title_arr = (title_arr, position_arr, application_arr, location_arr, link_arr)
     print(title_arr)
-    print(len(title_arr))
-    print(link_arr)
-    print(len(link_arr))
-    print(position_arr)
-    print(len(position_arr))
-    print(application_arr)
-    print(len(application_arr))
+    # print(set(title_arr))
+    # print(len(title_arr))
+    # print(link_arr)
+    # print(len(link_arr))
+    # print(position_arr)
+    # print(len(position_arr))
+    # print(application_arr)
+    # print(len(application_arr))
 
 
 

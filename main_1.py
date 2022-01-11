@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
+url_href = "https://fernuni-hagen.hr4you.org/"
 URL = "https://www.fernuni-hagen.de/uniintern/arbeitsthemen/karriere/stellen/index.shtml"
 
 title_arr = []
@@ -52,7 +52,12 @@ def grab(driver):
         tds = jobs.find_all("td")
         for index, td in enumerate(tds):
             try:
-                link_arr.append(td.find("a")['href'])
+                a = td.find("a")['href']
+                start = a.find("generator")
+                end = a.find("ansicht")
+                ink = a[start:end - 4]
+                full_link = url_href + ink
+                link_arr.append(full_link)
             except:
                 print("No href")
             if index == 0:

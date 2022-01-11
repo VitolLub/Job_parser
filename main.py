@@ -40,43 +40,56 @@ def goto(driver, page):
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     div = soup.find('div', {'class': 'list'})
-    li = div.find_all('li')
-    # get all titles
-    for every in li:
-        for index in range(1,6):
-            # get all job titles
-            class_type = 'class'
-            tag_name = 'span'
-            data_type = index
-            class_name = 'list__label'
-            parser(every,class_type, tag_name, class_name, data_type)
+    try:
+        li = div.find_all('li')
+        # get all titles
+        for every in li:
+            for index in range(1,6):
+                # get all job titles
+                class_type = 'class'
+                tag_name = 'span'
+                data_type = index
+                class_name = 'list__label'
+                parser(every,class_type, tag_name, class_name, data_type)
+    except Exception as e:
+        print(e)
 
 def parser(div,class_type, tag_name, class_name, data_type):
-    print(data_type)
     if data_type == 1:
-        position = div.find_all('span', {'class': 'list__label'})
-        for pos in position:
-            position_arr.append(pos.text)
+        try:
+            position = div.find_all('span', {'class': 'list__label'})
+            for pos in position:
+                position_arr.append(pos.text)
+        except Exception as e:
+            position_arr.append("")
     if data_type == 2:
-        title = div.find_all('a')
-        for t in title:
-            title_arr.append(t.text)
-    # if data_type == 3:
-    #     company = div.find_all(str(tag_name), {str(class_type): str(class_name)})
-    #     for c in company:
-    #         print(c.text)
-    #         company_name.append(c.text)
+        try:
+            title = div.find_all('a')
+            for t in title:
+                title_arr.append(t.text)
+        except:
+            title_arr.append("")
     if data_type == 4:
-        location = div.find_all('p')
-        for index,l in enumerate(location):
-            if index==1:
-                company_name.append(l.text)
-            if index==2:
-                location_arr.append(l.text)
+
+            location = div.find_all('p')
+            for index,l in enumerate(location):
+                print(index)
+                print(l.text)
+                try:
+                    if index==1:
+                        company_name.append(l.text)
+                    if index==2:
+                        location_arr.append(l.text)
+                except:
+                    company_name.append("")
+                    location_arr.append("")
     if data_type == 5:
-        link = div.find_all('a', {'class': 'btn btn--flat btn--icon-right'})
-        for l in link:
-            link_arr.append(l['href'])
+        try:
+            link = div.find_all('a', {'class': 'btn btn--flat btn--icon-right'})
+            for l in link:
+                link_arr.append(l['href'])
+        except:
+            link_arr.append("")
     return div
 
 if __name__ == '__main__':
@@ -84,7 +97,10 @@ if __name__ == '__main__':
     driver = accept_cookies(driver)
     time.sleep(3)
     for i in range(1,PAGE):
-        goto(driver,i)
+        try:
+            goto(driver,i)
+        except Exception as e:
+            print(e)
 
     print(position_arr)
     print(len(position_arr))
